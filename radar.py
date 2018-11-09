@@ -17,11 +17,7 @@ draw = ImageDraw.Draw(source_img) #Pour pouvoir dessiner plus tard
 while 1: # Boucle infinie
 	measurement = ser.readline() #Exemple: 60, 100 = degree, cm
 
-	degree, distance = measurement.split(', ') # "60, 100" --> degree = "60", distance = "100"
-	
-	#string --> int conversion
-	degree = int(degree) # "60" --> 60
-	distance = int(distance)
+	degree, distance = list(map(int, measurement.split(', '))) # "60, 100" --> degree = 60, distance = 100
 
 	#Coordonnées de l'obstacle
 	ypos = float(math.sin(degree*math.pi/180)*distance) #for y
@@ -41,6 +37,6 @@ while 1: # Boucle infinie
 	save = save + 1 # À chaque fois on ajoute 1, à 5 on sauvegardera
 
 	#Finalement, on sauvegarde l'image tous les 5 points
-	if save=5:
+	if save==5:
 		source_img.save("test.jpg", "JPEG")
 		save=0 # On réinitialise le compteur
