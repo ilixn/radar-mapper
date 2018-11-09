@@ -15,19 +15,23 @@ except:
 draw = ImageDraw.Draw(source_img) #Pour pouvoir dessiner plus tard
 
 while 1: # Boucle infinie
-	measurement = ser.readline() #Exemple: 60, 100 = degree, cm
+	measurement = ser.readline() #Exemple: 0, 0, 60, 100 = x, y, degree, cm
 
-	degree, distance = measurement.split(', ') # "60, 100" --> degree = "60", distance = "100"
-	
-	#string --> int conversion
-	degree = int(degree) # "60" --> 60
-	distance = int(distance)
+	robot_x, robot_y, degree, distance = list(map(int, measurement.split(", "))) # "0, 0, 60, 100" --> robot_x = 0, robot_y = 0, degree = 60, distance = 100
 
-	#Coordonnées de l'obstacle
+	if degree == 180:
+		degree = 181
+
+	#Coordonnées de l'obstacle par rapport au robot
 	ypos = float(math.sin(degree*math.pi/180)*distance) #for y
 	xpos = float(math.cos(degree*math.pi/180)*distance) #for x
 
-	print("x: " + str(xpos) + " | y: " + str(ypos)) #On affiche une ligne d'information donnant la position de l'objet x/y
+	print("Par rapport au robot: x: " + str(xpos) + " | y: " + str(ypos)) #On affiche une ligne d'information donnant la position de l'objet x/y
+
+	#Calcul des position absolues (depuis le point où le robot a commencé):
+	xpos = xpos + robot_x
+	ypos = ypos + robot_y
+	print("Position finale: x: " + str(xpos) + " | y: " + str(ypos))
 
 	#les coordonnées pour le dessin (l'image) qui fait 600*600px
 	#Dans l'image (0,0) est en haut à gauche et x --> droite et y --> bas
@@ -37,10 +41,13 @@ while 1: # Boucle infinie
 
 	#Point de 10*10px pour représenter la mesure
 	draw.rectangle([xprint - 5, yprint - 5, xprint + 5, yprint + 5], fill="black") # [x0, y0, x1, y1]
+	print("Position imprimée: x: " + str(xprint) + " | y: " + str(yprint))
+	print("--------")
 
 	save = save + 1 # À chaque fois on ajoute 1, à 5 on sauvegardera
 
 	#Finalement, on sauvegarde l'image tous les 5 points
-	if save=5:
+	if save==5:
 		source_img.save("test.jpg", "JPEG")
 		save=0 # On réinitialise le compteur
+		print("image sauvegardée")
