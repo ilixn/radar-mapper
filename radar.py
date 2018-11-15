@@ -56,7 +56,10 @@ while 1: # Boucle infinie
 	if ypos < image_y * 600 - 300:
 		image_y -= 1
 
-
+	#On détermine les coordonnées par raport au centre de l'image qu'on vient de déterminer.
+	xpos = xpos - (image_x*600)
+	ypos = ypos - (image_y*600)
+	
 	#------Détermination des coordonnées sur l'image
 	#les coordonnées pour le dessin (l'image) qui fait 600*600px
 	#Dans l'image (0,0) est en haut à gauche et x --> droite et y --> bas
