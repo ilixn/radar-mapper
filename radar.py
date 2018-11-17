@@ -19,6 +19,8 @@ draw = ImageDraw.Draw(source_img) #Pour pouvoir dessiner plus tard
 
 while 1: # Boucle infinie
 	measurement = ser.readline() #Exemple: -1, 0, 60, 100 = x, y, degree, cm
+	#measurement = str(input()) #(Pour tester)
+	print(measurement)
 	
 
 	#------Mesures
@@ -41,20 +43,30 @@ while 1: # Boucle infinie
 	
 
 	#------Détermination de l'image sur laquelle on doit dessiner
-	if xpos > image_x * 600 + 300:
-		image_x += 1
-		#Chaque image fait 600px de large donc par exemple le centre de 
-		#l'image directement à droite de celle du centre et donc de coordonnées (1,0) se situe en (600,0)
-		#Le bord de l'image est situé à 300px de plus, ce qui donne 1*600+300
+	#On teste si le point à dessiner se trouve hors de 
+	#l'image actuellement "sélectionnée" (désignée par image_x et image_y)
+	#L'opération est réalisée plusieurs fois au cas où l'on devrait changer de plus d'une image.
+	recommencer = 1
+	while (recommencer==1):
+		recommencer = 0
+		if xpos > image_x * 600 + 300:
+			image_x += 1
+			#Chaque image fait 600px de large donc par exemple le centre de 
+			#l'image directement à droite de celle du centre et donc de coordonnées (1,0) se situe en (600,0)
+			#Le bord de l'image est situé à 300px de plus, ce qui donne 1*600+300
+			recommencer = 1
 
-	if xpos < image_x * 600 - 300:
-		image_x -= 1
+		if xpos < image_x * 600 - 300:
+			image_x -= 1
+			recommencer = 1
 
-	if ypos > image_y * 600 + 300:
-		image_y += 1
+		if ypos > image_y * 600 + 300:
+			image_y += 1
+			recommencer = 1
 
-	if ypos < image_y * 600 - 300:
-		image_y -= 1
+		if ypos < image_y * 600 - 300:
+			image_y -= 1
+			recommencer = 1
 
 	#On détermine les coordonnées par raport au centre de l'image qu'on vient de déterminer.
 	xpos = xpos - (image_x*600)
@@ -69,7 +81,7 @@ while 1: # Boucle infinie
 
 	#Point de 10*10px pour représenter la mesure
 	draw.rectangle([xprint - 5, yprint - 5, xprint + 5, yprint + 5], fill="black") # [x0, y0, x1, y1]
-	print("Position imprimée: x: " + str(xprint) + " | y: " + str(yprint))
+	print("Position imprimée: x: " + str(xprint) + " | y: " + str(yprint) + " | Image: " + str(image_x) + ", " + str(image_y))
 	print("--------")
 
 
