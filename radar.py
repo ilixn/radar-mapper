@@ -5,7 +5,6 @@ import math
 from PIL import Image, ImageDraw
 
 ser = serial.Serial('/dev/ttyUSB0', 9600) #Le port de l'arduino (linux)
-save=0 #variable pour compter avant de sauvegarder
 image_x, image_y = 0,0
 
 while 1: # Boucle infinie
@@ -76,7 +75,7 @@ while 1: # Boucle infinie
 def save(draw_x, draw_y, point_x, point_y):
 	#Ouverture de l'image pour y dessiner
 	try:
-		image = Image.open("map_" + str(draw_x) + "," + str(draw_y)  ".jpg")
+		image = Image.open("map_" + str(draw_x) + "," + str(draw_y) + ".jpg")
 	except:
 		image = Image.new('1', (600, 600), "white")
 
@@ -90,6 +89,6 @@ def save(draw_x, draw_y, point_x, point_y):
 	print("Position imprimée: x: " + str(point_x) + " | y: " + str(point_y) + " | Image: " + str(draw_x) + ", " + str(draw_y))
 	print("---------------")
 	
-	image.save("map_" + str(draw_x) + "," + str(draw_y)  ".jpg")
+	image.save("map_" + str(draw_x) + "," + str(draw_y) + ".jpg")
 	
 	
