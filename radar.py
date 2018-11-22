@@ -8,22 +8,13 @@ ser = serial.Serial('/dev/ttyUSB0', 9600) #Le port de l'arduino (linux)
 save=0 #variable pour compter avant de sauvegarder
 image_x, image_y = 0,0
 
-#Ouverture de l'image pour y dessiner
-try:
-	source_img = Image.open("test.jpg")
-except:
-	print("L'image n'existe pas")
-
-
-draw = ImageDraw.Draw(source_img) #Pour pouvoir dessiner plus tard
-
 while 1: # Boucle infinie
 	measurement = ser.readline() #Exemple: -1, 0, 60, 100 = x, y, degree, cm
 	#measurement = str(input()) #(Pour tester)
 	print(measurement)
 	
-
-	#------Mesures
+	
+	#------Obtention des Mesures que l'arduino a envoyées
 	robot_x, robot_y, degree, distance = list(map(int, measurement.split(", "))) # "0, 0, 60, 100" --> robot_x = 0, robot_y = 0, degree = 60, distance = 100
 
 	if degree == 180:
@@ -36,7 +27,7 @@ while 1: # Boucle infinie
 
 	print("Par rapport au robot: x: " + str(xpos) + " | y: " + str(ypos)) #On affiche une ligne d'information donnant la position de l'objet x/y
 
-	#Calcul des position absolues (depuis le point où le robot a commencé):
+	#------Calcul des position absolues (depuis le point où le robot a commencé):
 	xpos = xpos + robot_x
 	ypos = ypos + robot_y
 	print("Position finale: x: " + str(xpos) + " | y: " + str(ypos))
@@ -79,16 +70,26 @@ while 1: # Boucle infinie
 	xprint = xpos + 300
 	yprint = 300 - ypos
 
-	#Point de 10*10px pour représenter la mesure
-	draw.rectangle([xprint - 5, yprint - 5, xprint + 5, yprint + 5], fill="black") # [x0, y0, x1, y1]
-	print("Position imprimée: x: " + str(xprint) + " | y: " + str(yprint) + " | Image: " + str(image_x) + ", " + str(image_y))
-	print("--------")
-
-
 	#------Sauvegarde de l'image
-	save = save + 1 # À chaque fois on ajoute 1, à 5 on sauvegardera
-	#Finalement, on sauvegarde l'image tous les 5 points
-	if save==10:
-		source_img.save("test.jpg", "JPEG")
-		save=0 # On réinitialise le compteur
-		print("image sauvegardée")
+	save(image_x, image_y, xprint, yprint)
+		
+def save(draw_x, draw_y, point_x, point_y):
+	#Ouverture de l'image pour y dessiner
+	try:
+		image = Image.open("map_" + str(draw_x) + "," + str(draw_y)  ".jpg")
+	except:
+		image = Image.new('1', (600, 600), "white")
+
+	#Pour pouvoir dessiner plus tard
+	draw = ImageDraw.Draw(image)
+	
+	#Point de 10*10px pour représenter la mesure
+	draw.rectangle([point_x - 5, point_y - 5, point_x + 5, point_y + 5], fill="black") # [x0, y0, x1, y1]
+	
+	#On dit ce qu'on a fait
+	print("Position imprimée: x: " + str(point_x) + " | y: " + str(point_y) + " | Image: " + str(draw_x) + ", " + str(draw_y))
+	print("---------------")
+	
+	image.save("map_" + str(draw_x) + "," + str(draw_y)  ".jpg")
+	
+	
