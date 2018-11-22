@@ -7,6 +7,26 @@ from PIL import Image, ImageDraw
 ser = serial.Serial('/dev/ttyUSB0', 9600) #Le port de l'arduino (linux)
 image_x, image_y = 0,0
 
+def save(draw_x, draw_y, point_x, point_y):
+	#Ouverture de l'image pour y dessiner
+	try:
+		image = Image.open("map_" + str(draw_x) + "," + str(draw_y) + ".jpg")
+	except:
+		image = Image.new('1', (600, 600), "white")
+
+	#Pour pouvoir dessiner plus tard
+	draw = ImageDraw.Draw(image)
+	
+	#Point de 10*10px pour représenter la mesure
+	draw.rectangle([point_x - 5, point_y - 5, point_x + 5, point_y + 5], fill="black") # [x0, y0, x1, y1]
+	
+	#On dit ce qu'on a fait
+	print("Position imprimée: x: " + str(point_x) + " | y: " + str(point_y) + " | Image: " + str(draw_x) + ", " + str(draw_y))
+	print("---------------")
+	
+	image.save("map_" + str(draw_x) + "," + str(draw_y) + ".jpg")
+	
+
 while 1: # Boucle infinie
 	measurement = ser.readline() #Exemple: -1, 0, 60, 100 = x, y, degree, cm
 	#measurement = str(input()) #(Pour tester)
@@ -72,23 +92,5 @@ while 1: # Boucle infinie
 	#------Sauvegarde de l'image
 	save(image_x, image_y, xprint, yprint)
 		
-def save(draw_x, draw_y, point_x, point_y):
-	#Ouverture de l'image pour y dessiner
-	try:
-		image = Image.open("map_" + str(draw_x) + "," + str(draw_y) + ".jpg")
-	except:
-		image = Image.new('1', (600, 600), "white")
 
-	#Pour pouvoir dessiner plus tard
-	draw = ImageDraw.Draw(image)
-	
-	#Point de 10*10px pour représenter la mesure
-	draw.rectangle([point_x - 5, point_y - 5, point_x + 5, point_y + 5], fill="black") # [x0, y0, x1, y1]
-	
-	#On dit ce qu'on a fait
-	print("Position imprimée: x: " + str(point_x) + " | y: " + str(point_y) + " | Image: " + str(draw_x) + ", " + str(draw_y))
-	print("---------------")
-	
-	image.save("map_" + str(draw_x) + "," + str(draw_y) + ".jpg")
-	
 	
