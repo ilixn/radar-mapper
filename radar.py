@@ -28,19 +28,6 @@ def save(draw_x, draw_y, point_x, point_y):
 	
 
 while 1: # Boucle infinie
-<<<<<<< HEAD
-	measurement = ser.readline() #Exemple: 60, 100 = degree, cm
-
-	degree, distance = list(map(int, measurement.split(', '))) # "60, 100" --> degree = 60, distance = 100
-||||||| merged common ancestors
-	measurement = ser.readline() #Exemple: 60, 100 = degree, cm
-
-	degree, distance = measurement.split(', ') # "60, 100" --> degree = "60", distance = "100"
-	
-	#string --> int conversion
-	degree = int(degree) # "60" --> 60
-	distance = int(distance)
-=======
 	measurement = ser.readline() #Exemple: -1, 0, 60, 100 = x, y, degree, cm
 	#measurement = str(input()) #(Pour tester)
 	print(measurement)
@@ -52,7 +39,6 @@ while 1: # Boucle infinie
 	if degree == 180:
 		degree = 181 #Quand l'angle est à 180, ça renvoie un truc bizarre
 
->>>>>>> multiple-images
 
 	#------Détermination des coordonnées de l'obstacle par rapport au robot
 	ypos = float(math.sin(degree*math.pi/180)*distance) #for y
@@ -105,9 +91,4 @@ while 1: # Boucle infinie
 
 	#------Sauvegarde de l'image
 	save(image_x, image_y, xprint, yprint)
-		
-
-<<<<<<< HEAD
-	save = save + 1 # À chaque fois on ajoute 1, à 5 on sauvegardera
-
 	
