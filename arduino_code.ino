@@ -5,29 +5,17 @@ int robotx = 0;
 int roboty = 0;
 int pin_servo = 5; //PIN du servomoteur
 int degre = 0;
-Ultrasonic *capteurs[4];
 Servo myservo;
+
+Ultrasonic capteur1(10);
+Ultrasonic capteur2(11);
+Ultrasonic capteur3(12);
+//Ultrasonic capteur4(13);
 
 void setup() {  
   myservo.attach(pin_servo); // On démarre le servomoteur
   Serial.begin(9600); // On commence à parler à l'ordi
-
-  Ultrasonic capteur1(1);
-  Ultrasonic capteur2(2);
-  Ultrasonic capteur3(3);
-  Ultrasonic capteur4(4);
-
   
-  capteurs[0] = &capteur1;
-  capteurs[1] = &capteur2;
-  capteurs[2] = &capteur3;
-  capteurs[3] = &capteur4;
-/*
-  Ultrasonic capteurs[4];
-  capteurs[0] = capteur1;
-  capteurs[1] = capteur2;
-  capteurs[2] = capteur3;
-  capteurs[3] = capteur4;*/
 }
 
 void loop() {
@@ -36,14 +24,26 @@ void loop() {
 }
 
 void envoi_Mesure() {
-  for(int i = 0; i < 4; i++) {
+  Serial.println(capteur1.MeasureInCentimeters());
+  Serial.println(capteur2.MeasureInCentimeters());
+  Serial.println(capteur3.MeasureInCentimeters());
+  //Serial.println(capteur4.MeasureInCentimeters());
+
+  /*
+  for(int i = 0; i < 1; i++) {
     long RangeInCentimeters; 
-    RangeInCentimeters = capteurs[i]->MeasureInCentimeters();   // On fait la mesure
+    //RangeInCentimeters = capteurs[i]->MeasureInCentimeters();   // On fait la mesure
+    RangeInCentimeters = capteur1.MeasureInCentimeters();
     if(RangeInCentimeters < 516) {    // Le capteur renvoie 517 si il ne détecte rien ou si il beug --> pas d'envoi
-      //Serial.println(robotx, ", ", roboty, ", ", degre, ", ", RangeInCentimeters);
-      Serial.print(robotx);
+      Serial.println((robotx, ", ", roboty, ", ", degre, ", ", RangeInCentimeters));
+      Serial.println(RangeInCentimeters);
     }
+  }
+  */
+  if (degre == 180) {
+    degre = 0;
   }
   degre += 5;
   myservo.write(degre);
+  delay(500);
 }
