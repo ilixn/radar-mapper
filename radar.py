@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import serial
 import math
 from PIL import Image, ImageDraw
 
