@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import sys
 import serial
 import math
 from PIL import Image, ImageDraw
 
-ser = serial.Serial('/dev/ttyUSB0', 9600) #Le port de l'arduino (linux)
 image_x, image_y = 0,0
 
 def save(draw_x, draw_y, point_x, point_y):
@@ -22,19 +22,19 @@ def save(draw_x, draw_y, point_x, point_y):
 	
 	#On dit ce qu'on a fait
 	print("Position imprimée: x: " + str(point_x) + " | y: " + str(point_y) + " | Image: " + str(draw_x) + ", " + str(draw_y))
-	print("---------------")
+	print("-------OK------")
 	
 	image.save("map_" + str(draw_x) + "," + str(draw_y) + ".jpg")
 	
 
-while 1: # Boucle infinie
-	measurement = ser.readline() #Exemple: -1, 0, 60, 100 = x, y, degree, cm
-	#measurement = str(input()) #(Pour tester)
+def draw_image(measurement):
 	print(measurement)
+	global image_x
+	global image_y
 	
 	
 	#------Obtention des Mesures que l'arduino a envoyées
-	robot_x, robot_y, degree, distance = list(map(int, measurement.split(", "))) # "0, 0, 60, 100" --> robot_x = 0, robot_y = 0, degree = 60, distance = 100
+	robot_x, robot_y, degree, distance = list(map(int, measurement.split(","))) # "0, 0, 60, 100" --> robot_x = 0, robot_y = 0, degree = 60, distance = 100
 
 	if degree == 180:
 		degree = 181 #Quand l'angle est à 180, ça renvoie un truc bizarre
@@ -92,3 +92,4 @@ while 1: # Boucle infinie
 	#------Sauvegarde de l'image
 	save(image_x, image_y, xprint, yprint)
 	
+draw_image(sys.argv[1])
