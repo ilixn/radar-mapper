@@ -23,14 +23,14 @@ void setup() {
 void loop() {
    delay(200);
    unsigned int distance = sonar.ping_cm();
-   if(distance > 3) {
+   if(distance > 3 || distance < 107) {
     Serial.print("0,0,");
     Serial.print(degre);
     Serial.print(",");
     Serial.println(distance);
    }
    servo.write(degre);
-   degre = degre + signe*2;
+   degre = degre + signe*6;
    if(degre==180 || degre==0) {
     signe = - signe;
    }
