@@ -45,7 +45,8 @@ def draw_image(measurement):
 
 	print("Par rapport au robot: x: " + str(xpos) + " | y: " + str(ypos)) #On affiche une ligne d'information donnant la position de l'objet x/y
 
-	#------Calcul des position absolues (depuis le point où le robot a commencé):
+
+	#------Calcul des positions absolues (depuis le point où le robot a commencé):
 	xpos = xpos + robot_x
 	ypos = ypos + robot_y
 	print("Position finale: x: " + str(xpos) + " | y: " + str(ypos))
@@ -81,12 +82,14 @@ def draw_image(measurement):
 	xpos = xpos - (image_x*600)
 	ypos = ypos - (image_y*600)
 	
+
 	#------Détermination des coordonnées sur l'image
 	#les coordonnées pour le dessin (l'image) qui fait 600*600px
 	#Dans l'image (0,0) est en haut à gauche et x --> droite et y --> bas
 	#On veut (0,0) au centre et x --> droite et y --> haut
 	xprint = xpos + 300
 	yprint = 300 - ypos
+
 
 	#------Sauvegarde de l'image
 	save(image_x, image_y, xprint, yprint)
