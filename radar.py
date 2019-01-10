@@ -34,6 +34,7 @@ def draw_image(measurement):
 	
 	#------Obtention des Mesures que l'arduino a envoyées
 	robot_x, robot_y, degree, distance = list(map(int, measurement.split(","))) # "0, 0, 60, 100" --> robot_x = 0, robot_y = 0, degree = 60, distance = 100
+	distance = distance*3
 
 	if degree == 180:
 		degree = 181 #Quand l'angle est à 180, ça renvoie un truc bizarre
