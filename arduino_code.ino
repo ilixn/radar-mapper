@@ -3,13 +3,22 @@
 
 int robotx = 0;
 int roboty = 0; //Position x, y
-int direction = 0; //boussole
+int orientation = 0; //boussole
 
 int degre = 0; //Servo
 int signe = 1;
 
 int pin_servo = 5; //PIN du servomoteur
 Servo myservo;
+
+//MOTEURS
+int pinI1 = 8;
+int pinI2 = 11;
+int moteurA = 9; //Devant
+int pinI3 = 12;
+int pinI4 = 13;
+int moteurB = 10; //Derrière
+int vitesse = 0;
 
 Ultrasonic capteur1(10);
 Ultrasonic capteur2(11);
