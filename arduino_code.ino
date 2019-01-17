@@ -25,12 +25,14 @@ void loop() {
   envoi_Mesure(capteur3.MeasureInCentimeters(), 180);
   //envoi_Mesure(capteur4.MeasureInCentimeters(), 180);
 
+  degre += 5*signe;
+
   if (degre == 180 || degre == 0) {
     signe = - signe;
   }
-  degre += 5*signe;
+  
   myservo.write(degre);
-  delay(500);
+  delay(200);
 }
 
 void envoi_Mesure(int mesure, int decalage) {
