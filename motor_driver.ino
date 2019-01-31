@@ -6,10 +6,10 @@ int pinI3 = 12;
 int pinI4 = 13;
 int moteurB = 10; //branché sur OUT3, OUT4
 
-int tour = 0;
-int huitieme = 0;
-int high = 0;
-int roue = 0;
+int tour = 0; //Tours de moteur
+int huitieme = 0; //huitièmes de tour
+int high = 0; //Pour ne pas compter un huitième deux fois
+int roue = 0; //Tours de roue
 
 int vitesse = 55;
 
@@ -34,39 +34,40 @@ void loop ()
 
 void compter() {
   int encodeur = analogRead(A2); //PIN de l'encodeur / 1 tour = 8 trous = 22 cm
-  if (encodeur > 2 && high == 0) {
+  if (encodeur > 2 && high == 0) { //On est devant un trou ET on était pas devant un trou avant, sinon on compte le même deux fois :/
     huitieme ++;
     if (huitieme == 8) {
-      tour ++;
+      tour ++; //8 huitièmes --> un tour de moteur
       huitieme = 0;
     }
 
-    //Serial.print(tour);
     high = 1;
   }
-  if (encodeur == 0) {
+  if (encodeur == 0) { // On st pas devant un trou, on met high à 0
     high = 0;
   }
-  if (tour == 46) {
+  if (tour == 46) { //Ratio de 1:46 plus ou moins
     roue ++;
     tour = 0;
-    Serial.println(roue);
+    Serial.println(roue); //Envoie le nombre de tours de roue pour info
   }
 }
 
 void avancer(int nb) {
-  roue = 0;
+  roue = 0; //On va compter des tours, on remet à 0
   while (roue < nb) {
-    moteurs(1, 1);
-    compter();
+    moteurs(1, 1); //On fait avancer  les deux moteurs en même temps
+    compter(); //Fonction qui va compter les tours, doit être appelée le plus souvent possible
   }
-  moteurs(-1, -1);
+  moteurs(-1, -1); //Marche arrière pour bloquer
   delay(80);
   moteurs(0, 0);
   roue = 0;
+  tour = 0;
+  huitieme = 0;
 }
 
-void moteurs(int gauche, int droite) { //Quel moteur faire avancer ?
+void moteurs(int gauche, int droite) { //Quel moteur faire avancer ? A REFAIRE
   if (gauche == 1) {
     analogWrite(moteurB, vitesse);
     digitalWrite(pinI4, HIGH);
