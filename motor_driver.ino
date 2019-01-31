@@ -11,7 +11,7 @@ int huitieme = 0; //huitièmes de tour
 int high = 0; //Pour ne pas compter un huitième deux fois
 int roue = 0; //Tours de roue
 
-int vitesse = 55;
+int vitesse = 9 5;
 
 void setup()
 {
@@ -30,6 +30,7 @@ void loop ()
 {
   avancer(10);
   delay(1000);
+  turn_left();
 }
 
 void compter() {
@@ -67,6 +68,31 @@ void avancer(int nb) {
   huitieme = 0;
 }
 
+/*void turn_right() {
+  int mesure = mesure();
+  while (mesure < mesure + 90)
+  {
+    moteurs(1, -1);
+  }
+  moteurs(-1, 1);
+  delay(80);
+  moteurs(0, 0);
+  }*/
+
+void turn_left() {
+  int mesure = 0;
+  while (mesure < 2) { // pour la boussole mettre >
+    moteurs(-1, 1);
+    compter();
+    mesure = roue;
+  }
+  moteurs(1, -1);
+  delay(80);
+  moteurs(0, 0);
+  roue = 0;
+  tour = 0;
+  huitieme = 0;
+}
 void moteurs(int gauche, int droite) { //Quel moteur faire avancer ? A REFAIRE
   if (gauche == 1) {
     analogWrite(moteurB, vitesse);
@@ -78,7 +104,7 @@ void moteurs(int gauche, int droite) { //Quel moteur faire avancer ? A REFAIRE
     digitalWrite(pinI4, LOW);
     digitalWrite(pinI3, LOW);
   }
-  if (gauche==-1)
+  if (gauche == -1)
   {
     analogWrite(moteurB, vitesse);
     digitalWrite(pinI4, LOW);
