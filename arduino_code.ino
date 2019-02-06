@@ -11,15 +11,6 @@ int signe = 1;
 int pin_servo = 5; //PIN du servomoteur
 Servo myservo;
 
-//MOTEURS
-int pinI1 = 8;
-int pinI2 = 11;
-int moteurA = 9; //Devant
-int pinI3 = 12;
-int pinI4 = 13;
-int moteurB = 10; //Derrière
-int vitesse = 0;
-
 Ultrasonic capteur1(10);
 Ultrasonic capteur2(11);
 Ultrasonic capteur3(12);
@@ -28,6 +19,7 @@ Ultrasonic capteur3(12);
 void setup() {
   myservo.attach(pin_servo); // On démarre le servomoteur
   myservo.write(0);
+
   Serial.begin(9600); // On commence à parler à l'ordi
 }
 
@@ -42,8 +34,9 @@ void loop() {
   if (degre == 180 || degre == 0) {
     signe = - signe;
   }
-  
+
   myservo.write(degre);
+
   delay(200);
 }
 
