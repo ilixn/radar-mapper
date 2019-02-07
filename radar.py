@@ -24,7 +24,13 @@ def save(draw_x, draw_y, point_x, point_y):
 	print("Position imprimée: x: " + str(point_x) + " | y: " + str(point_y) + " | Image: " + str(draw_x) + ", " + str(draw_y))
 	print("-------OK------")
 
-	image.save("map_" + str(draw_x) + "," + str(draw_y) + ".jpg")
+	#------Sauvegarde de l'image
+	global save_image_counter
+	if(save_image_counter == 10):
+		image.save("map_" + str(draw_x) + "," + str(draw_y) + ".jpg")
+		save_image_counter = 0
+	else:
+		save_image_counter += 1
 
 
 def draw_image(measurement):
@@ -94,13 +100,9 @@ def draw_image(measurement):
 
 
 	#------Sauvegarde de l'image
-	global save_image_counter
-	if(save_image_counter == 10):
-		save(image_x, image_y, xprint, yprint)
-		save_image_counter = 0
-	else:
-		save_image_counter += 1
+	save(image_x, image_y, xprint, yprint)
 
+#On sépare les mesures, envoyées séparées par des points (".")
 try:
 	mesures = sys.argv[1].split(".")
 except:
