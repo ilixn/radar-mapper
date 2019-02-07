@@ -11,7 +11,7 @@ int huitieme = 0; //huitièmes de tour
 int high = 0; //Pour ne pas compter un huitième deux fois
 int roue = 0; //Tours de roue
 
-int vitesse = 95;
+int vitesse = 50;
 
 void setup()
 {
@@ -73,7 +73,8 @@ void avancer(int nb) {
 }
 
 /*
-void turn_right() {
+void turn_right() { 
+  vitesse = 100;
   int mesure = mesure();
   while (mesure < mesure + 90)
   {
@@ -86,6 +87,7 @@ void turn_right() {
 */
 
 void turn_left() {
+vitesse = 100;
   int mesure = 0;
   while (mesure < 2) { // pour la boussole mettre >
     moteurs(-1, 1);
