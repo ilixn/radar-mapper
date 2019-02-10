@@ -1,10 +1,6 @@
-int pinI1 = 8;
-int pinI2 = 11;
-int moteurA = 9; //branché sur OUT1, OUT2
+int pinI1 = 8, pinI2 = 11, moteurA = 9; //branché sur OUT1, OUT2
 
-int pinI3 = 12;
-int pinI4 = 13;
-int moteurB = 10; //branché sur OUT3, OUT4
+int pinI3 = 12, pinI4 = 13, moteurB = 10; //branché sur OUT3, OUT4
 
 int tour = 0; //Tours de moteur
 int huitieme = 0; //huitièmes de tour
@@ -87,19 +83,17 @@ void turn_right() {
 */
 
 void turn_left() {
-vitesse = 100;
+  vitesse = 100;
   int mesure = 0;
   while (mesure < 2) { // pour la boussole mettre >
     moteurs(-1, 1);
     compter();
-    mesure = roue;
+    mesure = roue; //(Pas pour la boussole)
   }
   moteurs(1, -1);
   delay(80);
   moteurs(0, 0);
-  roue = 0;
-  tour = 0;
-  huitieme = 0;
+  reset_compteur();
 }
 
 void moteurs(int gauche, int droite) { //Quel moteur faire avancer ? A REFAIRE

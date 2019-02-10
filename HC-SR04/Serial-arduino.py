@@ -5,7 +5,7 @@ import serial
 from time import sleep
 import subprocess
 
-ser = serial.Serial('/dev/ttyUSB3', 9600)
+ser = serial.Serial('/dev/ttyUSB2', 9600)
 
 for loop in range(300):
 	#print(ser.readline().strip('\r\n'))
