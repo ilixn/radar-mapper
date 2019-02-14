@@ -1,5 +1,15 @@
 #include <Servo.h>
 #include <Ultrasonic.h>
+#include <Arduino.h>
+#include <Wire.h>
+// Compass
+#include "bmm150.h"
+#include "bmm150_defs.h"
+
+//<COMPASS
+BMM150 bmm = BMM150();
+bmm150_mag_data value_offset;
+// COMPASS>
 
 int robotx = 0, roboty = 0; //Position x, y
 int orientation = 0; //boussole: 0-360
@@ -11,9 +21,9 @@ Servo myservo;
 // SERVO>
 
 //<ULTRASONS
-Ultrasonic capteur1(10); //Ultrasons
-Ultrasonic capteur2(11);
-Ultrasonic capteur3(12);
+Ultrasonic capteur1(2); //Ultrasons
+Ultrasonic capteur2(3);
+Ultrasonic capteur3(4);
 //Ultrasonic capteur4(13);
 // ULTRASONS>
 
@@ -45,20 +55,25 @@ void setup() {
   pinMode(moteurB, OUTPUT);
 
   Serial.begin(9600); // On commence à parler à l'ordi
+
+  //BOUSSOLE
+  init_compass();
 }
 
 void loop() {
   scan();
+  delay(1000);
+  Serial.println(mesure_compass());
 }
 
 void scan() {
-  while(degre != 0) {
+  while (degre != 0) {
     envoi_Mesure(capteur1.MeasureInCentimeters(), 0);
     envoi_Mesure(capteur2.MeasureInCentimeters(), 90);
     envoi_Mesure(capteur3.MeasureInCentimeters(), 180);
     //envoi_Mesure(capteur4.MeasureInCentimeters(), 180);
 
-    degre += 5*signe;
+    degre += 5 * signe;
 
     if (degre == 180 || degre == 0) {
       signe = - signe;
@@ -67,7 +82,8 @@ void scan() {
     myservo.write(degre);
     delay(200);
   }
-  degre = 5; //(prochin scan)
+  degre = 5;
+  myservo.write(degre);
 }
 
 void envoi_Mesure(int mesure, int decalage) {
@@ -85,6 +101,136 @@ void envoi_Mesure(int mesure, int decalage) {
 
 
 
+void init_compass() {
+  if (bmm.initialize() == BMM150_E_ID_NOT_CONFORM) {
+    Serial.println("Chip ID can not read!");
+    while (1);
+  } else {
+    Serial.println("Initialize done!");
+  }
+
+  Serial.println("Start figure-8 calibration after 2 seconds.");
+  delay(2000);
+  calibrate(15000);
+  Serial.print("\n\rCalibrate done..");
+}
+
+/**
+   @brief Do figure-8 calibration for a limited time to get offset values of x/y/z axis.
+   @param timeout - seconds of calibration period.
+*/
+void calibrate(uint32_t timeout)
+{
+  int16_t value_x_min = 0;
+  int16_t value_x_max = 0;
+  int16_t value_y_min = 0;
+  int16_t value_y_max = 0;
+  int16_t value_z_min = 0;
+  int16_t value_z_max = 0;
+  uint32_t timeStart = 0;
+
+  bmm.read_mag_data();
+  value_x_min = bmm.raw_mag_data.raw_datax;
+  value_x_max = bmm.raw_mag_data.raw_datax;
+  value_y_min = bmm.raw_mag_data.raw_datay;
+  value_y_max = bmm.raw_mag_data.raw_datay;
+  value_z_min = bmm.raw_mag_data.raw_dataz;
+  value_z_max = bmm.raw_mag_data.raw_dataz;
+  delay(100);
+
+  timeStart = millis();
+
+  while ((millis() - timeStart) < timeout)
+  {
+    bmm.read_mag_data();
+
+    /* Update x-Axis max/min value */
+    if (value_x_min > bmm.raw_mag_data.raw_datax)
+    {
+      value_x_min = bmm.raw_mag_data.raw_datax;
+      // Serial.print("Update value_x_min: ");
+      // Serial.println(value_x_min);
+
+    }
+    else if (value_x_max < bmm.raw_mag_data.raw_datax)
+    {
+      value_x_max = bmm.raw_mag_data.raw_datax;
+      // Serial.print("update value_x_max: ");
+      // Serial.println(value_x_max);
+    }
+
+    /* Update y-Axis max/min value */
+    if (value_y_min > bmm.raw_mag_data.raw_datay)
+    {
+      value_y_min = bmm.raw_mag_data.raw_datay;
+      // Serial.print("Update value_y_min: ");
+      // Serial.println(value_y_min);
+
+    }
+    else if (value_y_max < bmm.raw_mag_data.raw_datay)
+    {
+      value_y_max = bmm.raw_mag_data.raw_datay;
+      // Serial.print("update value_y_max: ");
+      // Serial.println(value_y_max);
+    }
+
+    /* Update z-Axis max/min value */
+    if (value_z_min > bmm.raw_mag_data.raw_dataz)
+    {
+      value_z_min = bmm.raw_mag_data.raw_dataz;
+      // Serial.print("Update value_z_min: ");
+      // Serial.println(value_z_min);
+
+    }
+    else if (value_z_max < bmm.raw_mag_data.raw_dataz)
+    {
+      value_z_max = bmm.raw_mag_data.raw_dataz;
+      // Serial.print("update value_z_max: ");
+      // Serial.println(value_z_max);
+    }
+
+    Serial.print(".");
+    delay(100);
+
+  }
+
+  value_offset.x = value_x_min + (value_x_max - value_x_min) / 2;
+  value_offset.y = value_y_min + (value_y_max - value_y_min) / 2;
+  value_offset.z = value_z_min + (value_z_max - value_z_min) / 2;
+}
+
+int mesure_compass() {
+  float headingDegrees;
+  for (int i = 0; i < 5; i++) {
+    bmm150_mag_data value;
+    bmm.read_mag_data();
+
+    value.x = bmm.raw_mag_data.raw_datax - value_offset.x;
+    value.y = bmm.raw_mag_data.raw_datay - value_offset.y;
+    value.z = bmm.raw_mag_data.raw_dataz - value_offset.z;
+
+    float xyHeading = atan2(value.x, value.y);
+    float zxHeading = atan2(value.z, value.x);
+    float heading = xyHeading;
+
+    if (heading < 0)
+      heading += 2 * PI;
+    if (heading > 2 * PI)
+      heading -= 2 * PI;
+    headingDegrees += heading * 180 / M_PI;
+    float xyHeadingDegrees = xyHeading * 180 / M_PI;
+    float zxHeadingDegrees = zxHeading * 180 / M_PI;
+
+    delay(100);
+  }
+  headingDegrees = headingDegrees / 5;
+  return int(headingDegrees);
+}
+
+
+
+
+
 void compter() {
   int encodeur = analogRead(A2); //PIN de l'encodeur / 1 tour = 8 trous = 22 cm
   if (encodeur > 2 && high == 0) { //On est devant un trou ET on était pas devant un trou avant, sinon on compte le même deux fois :/
@@ -93,7 +239,7 @@ void compter() {
       tour ++; //8 huitièmes --> un tour de moteur
       huitieme = 0;
     }
-    
+
     high = 1; //On note qu'on est devant un trou
   }
   if (encodeur == 0) { // On est pas devant un trou, on met high à 0
@@ -125,7 +271,7 @@ void avancer(int nb) {
 }
 
 /*
-void turn_right() { 
+  void turn_right() {
   vitesse = 100;
   int mesure = mesure();
   while (mesure < mesure + 90)
@@ -135,7 +281,7 @@ void turn_right() {
   moteurs(-1, 1);
   delay(80);
   moteurs(0, 0);
-}
+  }
 */
 
 void turn_left() {
