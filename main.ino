@@ -264,19 +264,30 @@ void avancer(int nb) {
   reset_compteur();
 }
 
-/*
-  void turn_right() {
+void turn_right() {
+  Serial.println("turn_right();");
   vitesse = 100;
-  int mesure = mesure();
-  while (mesure < mesure + 90)
-  {
+  int mesure = 0;
+  int mesured = mesure_compass();
+  int arret = mesured + 90;
+  if(arret > 360) {
+    arret = arret - 360;
+  }
+  Serial.println(mesure);
+  Serial.println(arret);
+  while (mesure > arret + 7 || mesure < arret - 7) {
+    mesure = mesure_compass();
     moteurs(1, -1);
+    Serial.print("moteurs(1,-1); / ");
+    Serial.print(mesure);
+    Serial.print(" ");
+    Serial.println(arret);
   }
   moteurs(-1, 1);
   delay(80);
   moteurs(0, 0);
-  }
-*/
+  reset_compteur();
+}
 
 void turn_left() {
   Serial.println("turn_left();");
