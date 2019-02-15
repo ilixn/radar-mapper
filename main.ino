@@ -5,6 +5,8 @@
 // Compass
 #include "bmm150.h"
 #include "bmm150_defs.h"
+#include "MotorDriver.h"
+
 
 //<COMPASS
 BMM150 bmm = BMM150();
@@ -28,15 +30,14 @@ Ultrasonic capteur3(4);
 // ULTRASONS>
 
 //<MOTEURS
-int pinI1 = 8, pinI2 = 11, moteurA = 9; //branché sur OUT1, OUT2
-int pinI3 = 12, pinI4 = 13, moteurB = 10; //branché sur OUT3, OUT4
+MotorDriver motor;
 
 int tour = 0; //Tours de moteur
 int huitieme = 0; //huitièmes de tour
 int high = 0; //Pour ne pas compter un huitième deux fois
 int roue = 0; //Tours de roue
 
-int vitesse = 50;
+int vitesse = 100;
 // MOTEURS>
 
 
@@ -46,13 +47,7 @@ void setup() {
   myservo.write(0);
 
   //MOTEURS
-  pinMode(pinI1, OUTPUT);
-  pinMode(pinI2, OUTPUT);
-  pinMode(moteurA, OUTPUT);
-
-  pinMode(pinI3, OUTPUT);
-  pinMode(pinI4, OUTPUT);
-  pinMode(moteurB, OUTPUT);
+  motor.begin();
 
   Serial.begin(9600); // On commence à parler à l'ordi
 
@@ -61,9 +56,8 @@ void setup() {
 }
 
 void loop() {
-  scan();
+  turn_left();
   delay(1000);
-  Serial.println(mesure_compass());
 }
 
 void scan() {
@@ -200,7 +194,7 @@ void calibrate(uint32_t timeout)
 }
 
 int mesure_compass() {
-  float headingDegrees;
+  float headingDegrees = 0;
   for (int i = 0; i < 5; i++) {
     bmm150_mag_data value;
     bmm.read_mag_data();
@@ -285,12 +279,23 @@ void avancer(int nb) {
 */
 
 void turn_left() {
+  Serial.println("turn_left();");
   vitesse = 100;
   int mesure = 0;
-  while (mesure < 2) { // pour la boussole mettre >
+  int mesured = mesure_compass();
+  int arret = mesured - 90;
+  if(arret < 0) {
+    arret = 360 + arret;
+  }
+  Serial.println(mesure);
+  Serial.println(arret);
+  while (mesure > arret + 7 || mesure < arret - 7) {
+    mesure = mesure_compass();
     moteurs(-1, 1);
-    compter();
-    mesure = roue; //(Pas pour la boussole)
+    Serial.print("moteurs(-1,1); / ");
+    Serial.print(mesure);
+    Serial.print(" ");
+    Serial.println(arret);
   }
   moteurs(1, -1);
   delay(80);
@@ -300,35 +305,23 @@ void turn_left() {
 
 void moteurs(int gauche, int droite) { //Quel moteur faire avancer ? A REFAIRE
   if (gauche == 1) {
-    analogWrite(moteurB, vitesse);
-    digitalWrite(pinI4, HIGH);
-    digitalWrite(pinI3, LOW);
+    motor.speed(1, 100);
   }
   if (gauche == 0) {
-    analogWrite(moteurB, vitesse);
-    digitalWrite(pinI4, LOW);
-    digitalWrite(pinI3, LOW);
+    motor.brake(1);
   }
   if (gauche == -1)
   {
-    analogWrite(moteurB, vitesse);
-    digitalWrite(pinI4, LOW);
-    digitalWrite(pinI3, HIGH);
+    motor.speed(1, -100);
   }
 
   if (droite == 1) {
-    analogWrite(moteurA, vitesse);
-    digitalWrite(pinI2, LOW);
-    digitalWrite(pinI1, HIGH);
+    motor.speed(0, 100);
   }
   if (droite == 0) {
-    analogWrite(moteurA, vitesse);
-    digitalWrite(pinI2, LOW);
-    digitalWrite(pinI1, LOW);
+    motor.brake(0);
   }
   if (droite == -1) {
-    analogWrite(moteurA, vitesse);
-    digitalWrite(pinI2, HIGH);
-    digitalWrite(pinI1, LOW);
+    motor.speed(0, -100);
   }
 }
