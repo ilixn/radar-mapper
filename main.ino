@@ -37,7 +37,7 @@ int huitieme = 0; //huitièmes de tour
 int high = 0; //Pour ne pas compter un huitième deux fois
 int roue = 0; //Tours de roue
 
-int vitesse = 100;
+int vitesse = 90;
 // MOTEURS>
 
 
@@ -56,7 +56,7 @@ void setup() {
 }
 
 void loop() {
-  turn_left();
+  avancer(3);
   delay(1000);
 }
 
@@ -183,9 +183,8 @@ void calibrate(uint32_t timeout)
       // Serial.println(value_z_max);
     }
 
-    Serial.print(".");
+    Serial.println(millis());
     delay(100);
-
   }
 
   value_offset.x = value_x_min + (value_x_max - value_x_min) / 2;
@@ -266,7 +265,7 @@ void avancer(int nb) {
 
 void turn_right() {
   Serial.println("turn_right();");
-  vitesse = 100;
+  vitesse = 50;
   int mesure = 0;
   int mesured = mesure_compass();
   int arret = mesured + 90;
@@ -291,7 +290,7 @@ void turn_right() {
 
 void turn_left() {
   Serial.println("turn_left();");
-  vitesse = 100;
+  vitesse = 50;
   int mesure = 0;
   int mesured = mesure_compass();
   int arret = mesured - 90;
@@ -300,7 +299,7 @@ void turn_left() {
   }
   Serial.println(mesure);
   Serial.println(arret);
-  while (mesure > arret + 7 || mesure < arret - 7) {
+  while (mesure > arret + 15 || mesure < arret - 15) {
     mesure = mesure_compass();
     moteurs(-1, 1);
     Serial.print("moteurs(-1,1); / ");
@@ -316,23 +315,23 @@ void turn_left() {
 
 void moteurs(int gauche, int droite) { //Quel moteur faire avancer ? A REFAIRE
   if (gauche == 1) {
-    motor.speed(1, 100);
+    motor.speed(1, vitesse);
   }
   if (gauche == 0) {
     motor.brake(1);
   }
   if (gauche == -1)
   {
-    motor.speed(1, -100);
+    motor.speed(1, -vitesse);
   }
 
   if (droite == 1) {
-    motor.speed(0, 100);
+    motor.speed(0, vitesse-12);
   }
   if (droite == 0) {
     motor.brake(0);
   }
   if (droite == -1) {
-    motor.speed(0, -100);
+    motor.speed(0, -vitesse+12);
   }
 }
