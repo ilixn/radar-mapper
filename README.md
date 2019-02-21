@@ -18,3 +18,9 @@ Les coordonnées d'un point à partir de sa mesure sont calculées comme ceci:
     Y_point = distance_mesuree * sin(angle_mesure) + Y_robot
 ```
 Les points sont générés sur 9 images qui sont assemblées ensemble pour créer une grande carte.
+
+
+
+### Bibliothèques:
+https://github.com/Seeed-Studio/SeeedMotorShieldV2
+https://github.com/Seeed-Studio/Grove_3_Axis_Compass_V2.0_BMM150
