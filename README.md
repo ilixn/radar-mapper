@@ -10,7 +10,7 @@ La carte arduino envoie les mesures prises sous la forme: `50,80,45,115`
 
 La carte arduino prendra en compte l'angle que le robot a par rapport à sa position de départ ainsi que la distance parcourue depuis l'endroit où il s'est allumé.
 
-Les mesures sont envoyées avec un [shield wifi](http://wiki.seeedstudio.com/Wifi_Shield_V2.0/) à un [serveur](http://hellow.alwaysdata.net/radar-mapper) qui génère la carte de l'environnement avec le script python [radar.py](https://github.com/Hell0w/radar-mapper/blob/master/radar.py).
+Les mesures sont envoyées en serial (par câble) à un Raspberry Pi qui génère la carte de l'environnement avec le script python [radar.py](https://github.com/Hell0w/radar-mapper/blob/master/radar.py).
 
 Les coordonnées d'un point à partir de sa mesure sont calculées comme ceci:
 ```python
