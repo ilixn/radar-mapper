@@ -3,9 +3,12 @@
 import sys
 import math
 from PIL import Image, ImageDraw
+import serial
+
 
 image_x, image_y = 0,0
 save_image_counter = 0
+adresse_arduino = '/dev/ttyUSB0'
 
 def save(draw_x, draw_y, point_x, point_y):
 	#Ouverture de l'image pour y dessiner
@@ -102,12 +105,17 @@ def draw_image(measurement):
 	#------Sauvegarde de l'image
 	save(image_x, image_y, xprint, yprint)
 
-#On sépare les mesures, envoyées séparées par des points (".")
-try:
-	mesures = sys.argv[1].split(".")
-except:
-	print("Ooops! That's a failure")
-	sys.exit()
+#(Le code exécuté au début)
 
-for m in mesures:
-	draw_image(m) #Les coordonnées sont passées par le php (serveur)
+ser = serial.Serial(addresse_arduino, 9600)
+
+while 1:
+	#On sépare les mesures envoyées, séparées par des points (".")
+	try:
+		mesures = ser.readline().split(".")
+	except:
+		print("Ooops! That's a failure")
+		sys.exit()
+
+	for m in mesures:
+		draw_image(m) #Boucle sur toutes les mesures
