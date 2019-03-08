@@ -18,7 +18,7 @@ int orientation = 0; //boussole: 0-360
 
 //<SERVO
 int degre = 5, signe = 1;
-int pin_servo = 12; //PIN du servomoteur
+int pin_servo = 8; //PIN du servomoteur
 Servo myservo;
 // SERVO>
 
@@ -52,7 +52,7 @@ void setup() {
   Serial.begin(9600); // On commence à parler à l'ordi
 
   //BOUSSOLE
-  init_compass();
+  //init_compass();
 }
 
 void loop() {
@@ -62,12 +62,12 @@ void loop() {
 
 void scan() {
   while (degre != 0) {
-    capteur1.MeasureInCentimeters();
+    //capteur1.MeasureInCentimeters();
     capteur2.MeasureInCentimeters();
-    capteur3.MeasureInCentimeters();
-    envoi_Mesure(capteur1.RangeInCentimeters, 0);
+    //capteur3.MeasureInCentimeters();
+    //envoi_Mesure(capteur1.RangeInCentimeters, 0);
     envoi_Mesure(capteur2.RangeInCentimeters, 90);
-    envoi_Mesure(capteur3.RangeInCentimeters, 180);
+    //envoi_Mesure(capteur3.RangeInCentimeters, 180);
 
     degre += 5 * signe;
 
@@ -87,10 +87,16 @@ void envoi_Mesure(int mesure, int decalage) {
   Serial.print(",");
   Serial.print(roboty);
   Serial.print(",");
-  Serial.print(degre + decalage);
+  int degre_trigo = 90 - degre + decalage;
+  if(degre_trigo < 0) {
+    degre_trigo = 360 + degre_trigo;
+  }
+  Serial.print(degre_trigo);
   Serial.print(",");
   Serial.println(mesure);
 }
+
+
 
 
 
