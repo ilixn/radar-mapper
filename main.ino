@@ -18,14 +18,14 @@ int orientation = 0; //boussole: 0-360
 
 //<SERVO
 int degre = 5, signe = 1;
-int pin_servo = 5; //PIN du servomoteur
+int pin_servo = 12; //PIN du servomoteur
 Servo myservo;
 // SERVO>
 
 //<ULTRASONS
-Ultrasonic capteur1(2); //Ultrasons
-Ultrasonic capteur2(3);
-Ultrasonic capteur3(4);
+Ultrasonic capteur1(4); //Ultrasons
+Ultrasonic capteur2(2);
+Ultrasonic capteur3(3);
 //Ultrasonic capteur4(13);
 // ULTRASONS>
 
@@ -56,16 +56,18 @@ void setup() {
 }
 
 void loop() {
-  avancer(3);
+  scan();
   delay(1000);
 }
 
 void scan() {
   while (degre != 0) {
-    envoi_Mesure(capteur1.MeasureInCentimeters(), 0);
-    envoi_Mesure(capteur2.MeasureInCentimeters(), 90);
-    envoi_Mesure(capteur3.MeasureInCentimeters(), 180);
-    //envoi_Mesure(capteur4.MeasureInCentimeters(), 180);
+    capteur1.MeasureInCentimeters();
+    capteur2.MeasureInCentimeters();
+    capteur3.MeasureInCentimeters();
+    envoi_Mesure(capteur1.RangeInCentimeters, 0);
+    envoi_Mesure(capteur2.RangeInCentimeters, 90);
+    envoi_Mesure(capteur3.RangeInCentimeters, 180);
 
     degre += 5 * signe;
 
