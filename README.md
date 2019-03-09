@@ -1,6 +1,12 @@
 # radar-mapper
 
-### En français
+---
+**Note**
+
+:mega: :exclamation: Le projet utilise actuellement un raspberry pi à la place du shield wifi, il est donc conseillé d'aller voir [ici](https://github.com/Hell0w/radar-mapper/tree/raspberry-pi) !
+
+---
+
 _Radar-mapper_ est un robot, composé de deux moteurs 6V pour la propulsion commandés par un contrôleur [L298N](http://wiki.seeedstudio.com/Motor_Shield_V1.0/).
 Quatre [capteurs à ultrasons](https://www.seeedstudio.com/Grove-Ultrasonic-Ranger-p-960.html) sont fixés sur une plaque, elle même fixée sur un servomoteur qui fait des allers-retours. (0-180°)
 
@@ -21,7 +27,10 @@ Les points sont générés sur 9 images qui sont assemblées ensemble pour crée
 
 
 
+
 ### Bibliothèques:
 https://github.com/Seeed-Studio/SeeedMotorShieldV2
 
 https://github.com/Seeed-Studio/Grove_3_Axis_Compass_V2.0_BMM150
+
+https://github.com/SeeedDocument/Grove_Ultrasonic_Ranger
