@@ -52,7 +52,7 @@ void setup() {
   Serial.begin(9600); // On commence à parler à l'ordi
 
   //BOUSSOLE
-  //init_compass();
+  init_compass();
 }
 
 void loop() {
@@ -62,12 +62,12 @@ void loop() {
 
 void scan() {
   while (degre != 0) {
-    //capteur1.MeasureInCentimeters();
+    capteur1.MeasureInCentimeters();
     capteur2.MeasureInCentimeters();
-    //capteur3.MeasureInCentimeters();
-    //envoi_Mesure(capteur1.RangeInCentimeters, 0);
+    capteur3.MeasureInCentimeters();
+    envoi_Mesure(capteur1.RangeInCentimeters, 0);
     envoi_Mesure(capteur2.RangeInCentimeters, 90);
-    //envoi_Mesure(capteur3.RangeInCentimeters, 180);
+    envoi_Mesure(capteur3.RangeInCentimeters, 180);
 
     degre += 5 * signe;
 
