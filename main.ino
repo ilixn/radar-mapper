@@ -14,7 +14,6 @@ bmm150_mag_data value_offset;
 // COMPASS>
 
 int robotx = 0, roboty = 0; //Position x, y
-int orientation = 0; //boussole: 0-360
 
 //<SERVO
 int degre = 5, signe = 1;
@@ -53,6 +52,9 @@ void setup() {
 
   //BOUSSOLE
   init_compass();
+
+  delay(2000);
+  mesure_depart = mesure_compass();
 }
 
 void loop() {
@@ -60,6 +62,7 @@ void loop() {
   delay(1000);
 }
 
+//Scanne la pièce en aller-retour
 void scan() {
   while (degre != 0) {
     capteur1.MeasureInCentimeters();
@@ -82,6 +85,8 @@ void scan() {
   myservo.write(degre);
 }
 
+// Envoie la mesure à l'ordi en convertissant les degrés dans le sens trigonométrique.
+// TODO: intégrer la boussole
 void envoi_Mesure(int mesure, int decalage) {
   Serial.print(robotx);
   Serial.print(",");
@@ -200,6 +205,7 @@ void calibrate(uint32_t timeout)
   value_offset.z = value_z_min + (value_z_max - value_z_min) / 2;
 }
 
+// Effectue la mesure de l'orientation, dans le sens trigonométrique (à tester)
 int mesure_compass() {
   float headingDegrees = 0;
   for (int i = 0; i < 5; i++) {
@@ -225,6 +231,10 @@ int mesure_compass() {
     delay(100);
   }
   headingDegrees = headingDegrees / 5;
+  headingDegrees = 90 - headingDegrees;
+  if(headingDegrees < 0) {
+    headingDegrees = 360 + headingDegrees;
+  }
   return int(headingDegrees);
 }
 
@@ -276,13 +286,13 @@ void turn_right() {
   vitesse = 50;
   int mesure = 0;
   int mesured = mesure_compass();
-  int arret = mesured + 90;
-  if(arret > 360) {
-    arret = arret - 360;
+  int arret = mesured - 90;
+  if(arret < 0) {
+    arret = 360 - arret;
   }
   Serial.println(mesure);
   Serial.println(arret);
-  while (mesure > arret + 7 || mesure < arret - 7) {
+  while (mesure > arret + 15 || mesure < arret - 15) {
     mesure = mesure_compass();
     moteurs(1, -1);
     Serial.print("moteurs(1,-1); / ");
@@ -301,9 +311,9 @@ void turn_left() {
   vitesse = 50;
   int mesure = 0;
   int mesured = mesure_compass();
-  int arret = mesured - 90;
-  if(arret < 0) {
-    arret = 360 + arret;
+  int arret = mesured + 90;
+  if(arret > 360) {
+    arret = arret - 360;
   }
   Serial.println(mesure);
   Serial.println(arret);

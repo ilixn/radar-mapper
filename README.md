@@ -18,13 +18,13 @@ Les coordonnées d'un point à partir de sa mesure sont calculées comme ceci:
 ```
 Les points sont générés sur 9 images qui sont assemblées ensemble pour créer une grande carte.
 
-
+---
 :exclamation: Problèmes actuels:
 
 - Le servomoteur ne fonctionne pas en même temps que les moteurs
 - La boussole n'entre pas encore en compte dans les mesures
 - Le programme de déplacement autonome n'est pas encore géré
-
+---
 
 ### Bibliothèques:
 https://github.com/Seeed-Studio/SeeedMotorShieldV2
