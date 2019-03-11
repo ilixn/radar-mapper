@@ -57,10 +57,15 @@ void setup() {
   mesure_depart = mesure_compass();
 }
 
+
+
 void loop() {
   scan();
+  deplacement();
   delay(1000);
 }
+
+
 
 //Scanne la pièce en aller-retour
 void scan() {
@@ -123,8 +128,8 @@ void init_compass() {
 }
 
 /**
-   @brief Do figure-8 calibration for a limited time to get offset values of x/y/z axis.
-   @param timeout - seconds of calibration period.
+@brief Do figure-8 calibration for a limited time to get offset values of x/y/z axis.
+@param timeout - seconds of calibration period.
 */
 void calibrate(uint32_t timeout)
 {
@@ -240,7 +245,30 @@ int mesure_compass() {
 
 
 
-
+void deplacement() {
+  myservo.write(0);
+  capteur2.MeasureInCentimeters();
+  if(capteur2.RangeInCentimeters > 30) {
+    avancer(1);
+  }
+  else {
+    capteur1.MeasureInCentimeters();
+    if (capteur1.RangeInCentimeters > 30) {
+      turn_right();
+    }
+    else {
+      capteur3.MeasureInCentimeters();
+      if(capteur3.RangeInCentimeters > 30) {
+        turn_left();
+      }
+      else {
+        turn_left();
+        turn_left();
+        avancer(1);
+      }
+    }
+  }
+}
 
 void compter() {
   int encodeur = analogRead(A2); //PIN de l'encodeur / 1 tour = 8 trous = 22 cm
@@ -271,14 +299,15 @@ void reset_compteur() {
 
 void avancer(int nb) {
   reset_compteur(); //On va compter des tours, on remet à 0
+  moteurs(1, 1); //On fait avancer  les deux moteurs en même temps
   while (roue < nb) {
-    moteurs(1, 1); //On fait avancer  les deux moteurs en même temps
     compter(); //Fonction qui va compter les tours, doit être appelée le plus souvent possible
   }
   moteurs(-1, -1); //Marche arrière pour bloquer
   delay(80);
   moteurs(0, 0);
   reset_compteur();
+  delay(200);
 }
 
 void turn_right() {
@@ -288,7 +317,7 @@ void turn_right() {
   int mesured = mesure_compass();
   int arret = mesured - 90;
   if(arret < 0) {
-    arret = 360 - arret;
+    arret = 360 + arret;
   }
   Serial.println(mesure);
   Serial.println(arret);
@@ -304,6 +333,7 @@ void turn_right() {
   delay(80);
   moteurs(0, 0);
   reset_compteur();
+  delay(200);
 }
 
 void turn_left() {
@@ -329,6 +359,7 @@ void turn_left() {
   delay(80);
   moteurs(0, 0);
   reset_compteur();
+  delay(200);
 }
 
 void moteurs(int gauche, int droite) { //Quel moteur faire avancer ? A REFAIRE
@@ -344,12 +375,12 @@ void moteurs(int gauche, int droite) { //Quel moteur faire avancer ? A REFAIRE
   }
 
   if (droite == 1) {
-    motor.speed(0, vitesse-12);
+    motor.speed(0, vitesse - 12); //Ce moteur a l'air un peu moins puissant
   }
   if (droite == 0) {
     motor.brake(0);
   }
   if (droite == -1) {
-    motor.speed(0, -vitesse+12);
+    motor.speed(0, -vitesse + 12);
   }
 }
