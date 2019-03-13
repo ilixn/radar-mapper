@@ -14,18 +14,17 @@ bmm150_mag_data value_offset;
 // COMPASS>
 
 int robotx = 0, roboty = 0; //Position x, y
-int orientation = 0; //boussole: 0-360
 
 //<SERVO
 int degre = 5, signe = 1;
-int pin_servo = 5; //PIN du servomoteur
+int pin_servo = 8; //PIN du servomoteur
 Servo myservo;
 // SERVO>
 
 //<ULTRASONS
-Ultrasonic capteur1(2); //Ultrasons
-Ultrasonic capteur2(3);
-Ultrasonic capteur3(4);
+Ultrasonic capteur1(4); //Ultrasons
+Ultrasonic capteur2(2);
+Ultrasonic capteur3(3);
 //Ultrasonic capteur4(13);
 // ULTRASONS>
 
@@ -53,19 +52,30 @@ void setup() {
 
   //BOUSSOLE
   init_compass();
+
+  delay(2000);
+  mesure_depart = mesure_compass();
 }
 
+
+
 void loop() {
-  avancer(3);
+  scan();
+  deplacement();
   delay(1000);
 }
 
+
+
+//Scanne la pièce en aller-retour
 void scan() {
   while (degre != 0) {
-    envoi_Mesure(capteur1.MeasureInCentimeters(), 0);
-    envoi_Mesure(capteur2.MeasureInCentimeters(), 90);
-    envoi_Mesure(capteur3.MeasureInCentimeters(), 180);
-    //envoi_Mesure(capteur4.MeasureInCentimeters(), 180);
+    capteur1.MeasureInCentimeters();
+    capteur2.MeasureInCentimeters();
+    capteur3.MeasureInCentimeters();
+    envoi_Mesure(capteur1.RangeInCentimeters, 0);
+    envoi_Mesure(capteur2.RangeInCentimeters, 90);
+    envoi_Mesure(capteur3.RangeInCentimeters, 180);
 
     degre += 5 * signe;
 
@@ -80,15 +90,23 @@ void scan() {
   myservo.write(degre);
 }
 
+// Envoie la mesure à l'ordi en convertissant les degrés dans le sens trigonométrique.
+// TODO: intégrer la boussole
 void envoi_Mesure(int mesure, int decalage) {
   Serial.print(robotx);
   Serial.print(",");
   Serial.print(roboty);
   Serial.print(",");
-  Serial.print(degre + decalage);
+  int degre_trigo = 90 - degre + decalage;
+  if(degre_trigo < 0) {
+    degre_trigo = 360 + degre_trigo;
+  }
+  Serial.print(degre_trigo);
   Serial.print(",");
   Serial.println(mesure);
 }
+
+
 
 
 
@@ -110,8 +128,8 @@ void init_compass() {
 }
 
 /**
-   @brief Do figure-8 calibration for a limited time to get offset values of x/y/z axis.
-   @param timeout - seconds of calibration period.
+@brief Do figure-8 calibration for a limited time to get offset values of x/y/z axis.
+@param timeout - seconds of calibration period.
 */
 void calibrate(uint32_t timeout)
 {
@@ -192,6 +210,7 @@ void calibrate(uint32_t timeout)
   value_offset.z = value_z_min + (value_z_max - value_z_min) / 2;
 }
 
+// Effectue la mesure de l'orientation, dans le sens trigonométrique (à tester)
 int mesure_compass() {
   float headingDegrees = 0;
   for (int i = 0; i < 5; i++) {
@@ -217,12 +236,39 @@ int mesure_compass() {
     delay(100);
   }
   headingDegrees = headingDegrees / 5;
+  headingDegrees = 90 - headingDegrees;
+  if(headingDegrees < 0) {
+    headingDegrees = 360 + headingDegrees;
+  }
   return int(headingDegrees);
 }
 
 
 
-
+void deplacement() {
+  myservo.write(0);
+  capteur2.MeasureInCentimeters();
+  if(capteur2.RangeInCentimeters > 30) {
+    avancer(1);
+  }
+  else {
+    capteur1.MeasureInCentimeters();
+    if (capteur1.RangeInCentimeters > 30) {
+      turn_right();
+    }
+    else {
+      capteur3.MeasureInCentimeters();
+      if(capteur3.RangeInCentimeters > 30) {
+        turn_left();
+      }
+      else {
+        turn_left();
+        turn_left();
+        avancer(1);
+      }
+    }
+  }
+}
 
 void compter() {
   int encodeur = analogRead(A2); //PIN de l'encodeur / 1 tour = 8 trous = 22 cm
@@ -253,14 +299,15 @@ void reset_compteur() {
 
 void avancer(int nb) {
   reset_compteur(); //On va compter des tours, on remet à 0
+  moteurs(1, 1); //On fait avancer  les deux moteurs en même temps
   while (roue < nb) {
-    moteurs(1, 1); //On fait avancer  les deux moteurs en même temps
     compter(); //Fonction qui va compter les tours, doit être appelée le plus souvent possible
   }
   moteurs(-1, -1); //Marche arrière pour bloquer
   delay(80);
   moteurs(0, 0);
   reset_compteur();
+  delay(200);
 }
 
 void turn_right() {
@@ -268,13 +315,13 @@ void turn_right() {
   vitesse = 50;
   int mesure = 0;
   int mesured = mesure_compass();
-  int arret = mesured + 90;
-  if(arret > 360) {
-    arret = arret - 360;
+  int arret = mesured - 90;
+  if(arret < 0) {
+    arret = 360 + arret;
   }
   Serial.println(mesure);
   Serial.println(arret);
-  while (mesure > arret + 7 || mesure < arret - 7) {
+  while (mesure > arret + 15 || mesure < arret - 15) {
     mesure = mesure_compass();
     moteurs(1, -1);
     Serial.print("moteurs(1,-1); / ");
@@ -286,6 +333,7 @@ void turn_right() {
   delay(80);
   moteurs(0, 0);
   reset_compteur();
+  delay(200);
 }
 
 void turn_left() {
@@ -293,9 +341,9 @@ void turn_left() {
   vitesse = 50;
   int mesure = 0;
   int mesured = mesure_compass();
-  int arret = mesured - 90;
-  if(arret < 0) {
-    arret = 360 + arret;
+  int arret = mesured + 90;
+  if(arret > 360) {
+    arret = arret - 360;
   }
   Serial.println(mesure);
   Serial.println(arret);
@@ -311,6 +359,7 @@ void turn_left() {
   delay(80);
   moteurs(0, 0);
   reset_compteur();
+  delay(200);
 }
 
 void moteurs(int gauche, int droite) { //Quel moteur faire avancer ? A REFAIRE
@@ -326,12 +375,12 @@ void moteurs(int gauche, int droite) { //Quel moteur faire avancer ? A REFAIRE
   }
 
   if (droite == 1) {
-    motor.speed(0, vitesse-12);
+    motor.speed(0, vitesse - 12); //Ce moteur a l'air un peu moins puissant
   }
   if (droite == 0) {
     motor.brake(0);
   }
   if (droite == -1) {
-    motor.speed(0, -vitesse+12);
+    motor.speed(0, -vitesse + 12);
   }
 }

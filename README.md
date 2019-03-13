@@ -1,6 +1,5 @@
 # radar-mapper
 
-### En français
 _Radar-mapper_ est un robot, composé de deux moteurs 6V pour la propulsion commandés par un contrôleur [L298N](http://wiki.seeedstudio.com/Motor_Shield_V1.0/).
 Quatre [capteurs à ultrasons](https://www.seeedstudio.com/Grove-Ultrasonic-Ranger-p-960.html) sont fixés sur une plaque, elle même fixée sur un servomoteur qui fait des allers-retours. (0-180°)
 
@@ -19,7 +18,13 @@ Les coordonnées d'un point à partir de sa mesure sont calculées comme ceci:
 ```
 Les points sont générés sur 9 images qui sont assemblées ensemble pour créer une grande carte.
 
+---
+:exclamation: Problèmes actuels:
 
+- Le servomoteur ne fonctionne pas en même temps que les moteurs
+- La boussole n'entre pas encore en compte dans les mesures
+- Le programme de déplacement autonome n'est pas encore géré
+---
 
 ### Bibliothèques:
 https://github.com/Seeed-Studio/SeeedMotorShieldV2
