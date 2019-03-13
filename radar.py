@@ -8,7 +8,7 @@ import serial
 
 image_x, image_y = 0,0
 save_image_counter = 0
-adresse_arduino = '/dev/ttyUSB0'
+adresse_arduino = '/dev/ttyACM0'
 
 def save(draw_x, draw_y, point_x, point_y):
 	#Ouverture de l'image pour y dessiner
@@ -43,8 +43,14 @@ def draw_image(measurement):
 
 
 	#------Obtention des Mesures que l'arduino a envoyées
-	robot_x, robot_y, degree, distance = list(map(int, measurement.split(","))) # "0, 0, 60, 100" --> robot_x = 0, robot_y = 0, degree = 60, distance = 100
+	try:
+		robot_x, robot_y, degree, distance = list(map(int, measurement.split(","))) # "0, 0, 60, 100" --> robot_x = 0, robot_y = 0, degree = 60, distance = 100
+	except:
+		return
 	distance = distance*3
+	degree = degree * 330 / 360
+	if distance < 6:
+		return
 
 	if degree == 180:
 		degree = 181 #Quand l'angle est à 180, ça renvoie un truc bizarre
@@ -107,7 +113,7 @@ def draw_image(measurement):
 
 #(Le code exécuté au début)
 
-ser = serial.Serial(addresse_arduino, 9600)
+ser = serial.Serial(adresse_arduino, 9600)
 
 while 1:
 	#On sépare les mesures envoyées, séparées par des points (".")
