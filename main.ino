@@ -17,7 +17,7 @@ int robotx = 0, roboty = 0; //Position x, y
 
 //<SERVO
 int degre = 5, signe = 1;
-int pin_servo = 8; //PIN du servomoteur
+int pin_servo = 5; //PIN du servomoteur
 Servo myservo;
 // SERVO>
 
