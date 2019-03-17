@@ -11,12 +11,13 @@
 //<COMPASS
 BMM150 bmm = BMM150();
 bmm150_mag_data value_offset;
+int mesure_depart;
 // COMPASS>
 
 int robotx = 0, roboty = 0; //Position x, y
 
 //<SERVO
-int degre = 5, signe = 1;
+int degre = 10, signe = 1, decal = 0;
 int pin_servo = 5; //PIN du servomoteur
 Servo myservo;
 // SERVO>
@@ -46,22 +47,22 @@ void setup() {
   myservo.write(0);
 
   //MOTEURS
-  motor.begin();
+  //motor.begin();
 
   Serial.begin(9600); // On commence à parler à l'ordi
 
   //BOUSSOLE
-  init_compass();
+  //init_compass();
 
   delay(2000);
-  mesure_depart = mesure_compass();
+  //mesure_depart = mesure_compass();
 }
 
 
 
 void loop() {
   scan();
-  deplacement();
+  //deplacement();
   delay(1000);
 }
 
@@ -69,25 +70,30 @@ void loop() {
 
 //Scanne la pièce en aller-retour
 void scan() {
-  while (degre != 0) {
-    capteur1.MeasureInCentimeters();
+  while (degre != decal) {
+    //capteur1.MeasureInCentimeters();
     capteur2.MeasureInCentimeters();
-    capteur3.MeasureInCentimeters();
-    envoi_Mesure(capteur1.RangeInCentimeters, 0);
+    //capteur3.MeasureInCentimeters();
+    //envoi_Mesure(capteur1.RangeInCentimeters, 0);
     envoi_Mesure(capteur2.RangeInCentimeters, 90);
-    envoi_Mesure(capteur3.RangeInCentimeters, 180);
+    //envoi_Mesure(capteur3.RangeInCentimeters, 180);
 
-    degre += 5 * signe;
+    degre += 10 * signe;
 
-    if (degre == 180 || degre == 0) {
+    if (degre >= 180 || degre <= 0) {
       signe = - signe;
     }
 
     myservo.write(degre);
-    delay(200);
+    delay(170);
   }
-  degre = 5;
-  myservo.write(degre);
+  
+  decal += 1;
+  if(decal == 10) {
+    decal = 1;
+  }
+  degre = 10 + decal;
+  signe = 1;
 }
 
 // Envoie la mesure à l'ordi en convertissant les degrés dans le sens trigonométrique.
