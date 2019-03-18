@@ -7,7 +7,6 @@ import serial
 
 
 image_x, image_y = 0,0
-save_image_counter = 0
 adresse_arduino = '/dev/ttyACM0'
 
 def save(draw_x, draw_y, point_x, point_y):
@@ -28,12 +27,7 @@ def save(draw_x, draw_y, point_x, point_y):
 	print("-------OK------")
 
 	#------Sauvegarde de l'image
-	global save_image_counter
-	if(save_image_counter == 10):
-		image.save("map_" + str(draw_x) + "," + str(draw_y) + ".jpg")
-		save_image_counter = 0
-	else:
-		save_image_counter += 1
+	image.save("map_" + str(draw_x) + "," + str(draw_y) + ".jpg")
 
 
 def draw_image(measurement):
@@ -47,8 +41,7 @@ def draw_image(measurement):
 		robot_x, robot_y, degree, distance = list(map(int, measurement.split(","))) # "0, 0, 60, 100" --> robot_x = 0, robot_y = 0, degree = 60, distance = 100
 	except:
 		return
-	distance = distance*3
-	degree = degree * 330 / 360
+	distance = distance*4
 	if distance < 6:
 		return
 
